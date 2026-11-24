@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Prueba de app web</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icono-180.png">
+<meta name="theme-color" content="#0F2A44">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Prueba web">
+<style id="pagina"></style>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#0F2A44;--teal:#0E9F8E;--ink:#1B2733;--mut:#5D6B79;--line:#DCE3EA;--bg:#F3F6F9;--ok:#0E9F8E;--warn:#C4741F;--bad:#C0504D}
+body{font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.45;-webkit-text-size-adjust:100%}
+header{background:var(--navy);color:#fff;padding:calc(16px + env(safe-area-inset-top)) 16px 16px}
+header h1{font-size:22px}
+header p{color:#C9D6E3;font-size:14px;margin-top:4px}
+main{max-width:640px;margin:0 auto;padding:14px 12px 60px}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:14px;overflow:hidden}
+.card h2{background:#EEF2F6;color:var(--navy);font-size:17px;padding:11px 14px;display:flex;gap:10px;align-items:center}
+.card h2 .n{background:var(--navy);color:#fff;border-radius:50%;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.in{padding:12px 14px}
+ol{padding-left:22px;margin-bottom:12px}
+ol li{margin:5px 0}
+.dato{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-top:1px solid var(--line);font-size:15px}
+.dato:first-child{border-top:0}
+.cam+.dato{border-top:0;margin-top:6px}
+a{color:var(--teal)}
+.dato b{text-align:right;color:var(--navy)}
+button{font:600 16px inherit;font-family:inherit;border-radius:10px;border:1px solid var(--navy);background:var(--navy);color:#fff;padding:12px 14px;width:100%;margin-top:8px;cursor:pointer}
+button.sec{background:#fff;color:var(--navy)}
+button:disabled{opacity:.45}
+.cam{position:relative;width:100%;aspect-ratio:1/1;background:#000;border-radius:10px;overflow:hidden;margin-top:10px;display:none}
+.cam.on{display:block}
+.cam video{width:100%;height:100%;object-fit:cover;display:block}
+.cam .guia{position:absolute;inset:14%;border:3px solid rgba(255,255,255,.85);border-radius:12px;pointer-events:none}
+.cam.leido .guia{border-color:#3CE0A0;box-shadow:0 0 0 9999px rgba(14,159,142,.25)}
+#fotoCam.cam{aspect-ratio:3/4}
+.lista{font-size:14px;color:var(--mut);margin-top:8px;max-height:150px;overflow:auto}
+.lista div{padding:3px 0;border-top:1px solid var(--line)}
+.aviso{background:#FFF5E6;color:#8A5210;border-radius:8px;padding:9px 11px;font-size:14px;margin-top:10px;display:none}
+.aviso.on{display:block}
+#fotoRes{width:100%;border-radius:10px;margin-top:10px;display:none}
+.v{display:flex;gap:6px;margin-top:6px}
+.v button{margin:0;padding:10px 4px;font-size:14px;background:#fff;color:var(--ink);border-color:var(--line)}
+.v button.s[data-v="ok"]{background:var(--ok);border-color:var(--ok);color:#fff}
+.v button.s[data-v="reg"]{background:var(--warn);border-color:var(--warn);color:#fff}
+.v button.s[data-v="no"]{background:var(--bad);border-color:var(--bad);color:#fff}
+.res h3{font-size:15px;color:var(--navy);margin-top:14px}
+.res h3:first-child{margin-top:0}
+textarea,input[type=text]{width:100%;font:15px inherit;font-family:inherit;border:1px solid var(--line);border-radius:8px;padding:9px;margin-top:6px}
+textarea{min-height:190px}
+.imp{display:none}
+@media print{
+  header,main{display:none!important}
+  body{background:#fff}
+  body[data-print="etiqueta"] #impEtiqueta{display:block}
+  body[data-print="guia"] #impGuia{display:block}
+}
+#impEtiqueta{width:100mm;height:60mm;padding:4mm;font-family:Helvetica,Arial,sans-serif;color:#000;position:relative;overflow:hidden}
+#impEtiqueta .qr{position:absolute;left:4mm;top:4mm;width:34mm;height:34mm}
+#impEtiqueta .qr svg{width:100%;height:100%}
+#impEtiqueta .cod{position:absolute;left:42mm;top:4mm;font-size:8mm;font-weight:700;line-height:1.05}
+#impEtiqueta .ciu{position:absolute;left:42mm;top:22mm;font-size:5mm;font-weight:700}
+#impEtiqueta .pz{position:absolute;left:42mm;top:30mm;font-size:5mm}
+#impEtiqueta .regla{position:absolute;left:4mm;bottom:7mm;width:50mm;border-top:.5mm solid #000}
+#impEtiqueta .rt{position:absolute;left:4mm;bottom:2mm;font-size:3mm}
+#impGuia{font-family:Helvetica,Arial,sans-serif;color:#000;font-size:11pt}
+#impGuia .enc{border-bottom:2px solid #000;padding-bottom:4mm;margin-bottom:6mm;display:flex;justify-content:space-between;align-items:flex-end}
+#impGuia h1{font-size:18pt}
+#impGuia table{width:100%;border-collapse:collapse;margin:5mm 0}
+#impGuia td,#impGuia th{border:1px solid #000;padding:2mm;text-align:left}
+#impGuia th:last-child,#impGuia td:last-child{text-align:right}
+#impGuia .regla{width:100mm;border-top:.5mm solid #000;margin-top:10mm}
+#impGuia .qr{width:30mm;height:30mm}
+#impGuia .qr svg{width:100%;height:100%}
+</style>
+</head>
+<body>
+<header>
+  <h1>Prueba de app web</h1>
+  <p>Cuatro pruebas. Haz cada una en este celular y marca cómo te fue.</p>
+</header>
+<main>
+
+<section class="card">
+  <h2>Este celular</h2>
+  <div class="in">
+    <div class="dato"><span>Equipo y navegador</span><b id="dEquipo">…</b></div>
+    <div class="dato"><span>Abierta como app instalada</span><b id="dInst">…</b></div>
+    <div class="dato"><span>Lector de QR propio del navegador</span><b id="dBd">…</b></div>
+  </div>
+</section>
+
+<section class="card">
+  <h2><span class="n">1</span>Escaneo de QR</h2>
+  <div class="in">
+    <ol>
+      <li>Ten a la mano la hoja impresa con los 20 códigos. Se imprime desde una computadora, en la página <a href="codigos.html">codigos.html</a> de este mismo sitio.</li>
+      <li>Toca «Abrir cámara» y acepta el permiso.</li>
+      <li>Apunta a cada código, uno tras otro, hasta leer los 20.</li>
+      <li>Toca «Detener».</li>
+    </ol>
+    <button id="sBtn">Abrir cámara</button>
+    <div class="aviso" id="sAviso"></div>
+    <div class="cam" id="scanCam"><video id="sVid" playsinline muted autoplay></video><div class="guia"></div></div>
+    <div class="dato"><span>Códigos distintos leídos</span><b id="sN">0 de 20</b></div>
+    <div class="dato"><span>Último código</span><b id="sUlt">ninguno</b></div>
+    <div class="dato"><span>Segundos entre un código y el siguiente</span><b id="sProm">sin datos</b></div>
+    <div class="dato"><span>Milisegundos para analizar cada imagen</span><b id="sDec">sin datos</b></div>
+    <div class="lista" id="sLista"></div>
+  </div>
+</section>
+
+<section class="card">
+  <h2><span class="n">2</span>Impresión</h2>
+  <div class="in">
+    <ol>
+      <li>Enciende la impresora y conéctala a la misma red que el celular.</li>
+      <li>Toca «Imprimir etiqueta de ejemplo» y elige la impresora.</li>
+      <li>Mide la línea impresa: debe medir 5 cm.</li>
+      <li>Repite con «Imprimir guía de ejemplo». Su línea debe medir 10 cm.</li>
+    </ol>
+    <button id="pEt">Imprimir etiqueta de ejemplo (10 × 6 cm)</button>
+    <button id="pGu" class="sec">Imprimir guía de ejemplo (A4)</button>
+  </div>
+</section>
+
+<section class="card">
+  <h2><span class="n">3</span>Foto solo con la cámara</h2>
+  <div class="in">
+    <ol>
+      <li>Toca «Abrir cámara para la foto» y acepta los permisos de cámara y de ubicación.</li>
+      <li>Busca en la pantalla alguna forma de elegir una foto de la galería. No debe haber ninguna.</li>
+      <li>Toca «Tomar foto».</li>
+    </ol>
+    <button id="fBtn">Abrir cámara para la foto</button>
+    <div class="aviso" id="fAviso"></div>
+    <div class="cam" id="fotoCam"><video id="fVid" playsinline muted autoplay></video></div>
+    <button id="fTomar" style="display:none">Tomar foto</button>
+  </div>
+</section>
+
+<section class="card">
+  <h2><span class="n">4</span>Sello sobre la foto</h2>
+  <div class="in">
+    <ol>
+      <li>Toma la foto de la prueba 3.</li>
+      <li>Revisa que la foto de abajo lleve fecha, hora, ubicación y código en la franja inferior.</li>
+      <li>Compara la hora y el lugar con los reales.</li>
+    </ol>
+    <div class="dato"><span>Tamaño de la foto</span><b id="fTam">sin foto</b></div>
+    <div class="dato"><span>Ubicación</span><b id="fGeo">sin datos</b></div>
+    <div class="dato"><span>Margen de error</span><b id="fAcc">sin datos</b></div>
+    <img id="fotoRes" alt="Foto con sello">
+  </div>
+</section>
+
+<section class="card">
+  <h2>Resultados</h2>
+  <div class="in res">
+    <h3>1. Escaneo de QR</h3><div class="v" data-k="qr"></div>
+    <h3>2. Impresión</h3><div class="v" data-k="imp"></div>
+    <h3>3. Foto solo con la cámara</h3><div class="v" data-k="foto"></div>
+    <h3>4. Sello sobre la foto</h3><div class="v" data-k="sello"></div>
+    <h3>Notas</h3>
+    <input type="text" id="notas" placeholder="Lo que quieras anotar (opcional)">
+    <button id="copiar">Copiar resultados</button>
+    <textarea id="salida" readonly></textarea>
+  </div>
+</section>
+
+</main>
+
+<div class="imp" id="impEtiqueta">
+  <div class="qr"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" shape-rendering="crispEdges"><path fill="#ffffff" d="M0 0h25v25H0z"/><path stroke="#000000" d="M2 2.5h7m1 0h2m1 0h2m1 0h7M2 3.5h1m5 0h1m1 0h3m3 0h1m5 0h1M2 4.5h1m1 0h3m1 0h1m1 0h2m4 0h1m1 0h3m1 0h1M2 5.5h1m1 0h3m1 0h1m2 0h2m1 0h1m1 0h1m1 0h3m1 0h1M2 6.5h1m1 0h3m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h3m1 0h1M2 7.5h1m5 0h1m2 0h4m1 0h1m5 0h1M2 8.5h7m1 0h1m1 0h1m1 0h1m1 0h7M11 9.5h1m1 0h2M2 10.5h1m2 0h7m2 0h2m2 0h1m1 0h3M3 11.5h3m1 0h1m2 0h1m1 0h1m1 0h1m3 0h1m3 0h1M2 12.5h1m1 0h1m2 0h3m1 0h1m5 0h1m1 0h1m2 0h1M2 13.5h1m1 0h4m1 0h3m1 0h1m1 0h2m1 0h2M3 14.5h1m2 0h3m2 0h2m2 0h5m1 0h1M10 15.5h1m2 0h4m4 0h2M2 16.5h7m1 0h1m1 0h1m1 0h2m1 0h2m1 0h1m1 0h1M2 17.5h1m5 0h1m1 0h1m2 0h2m3 0h3M2 18.5h1m1 0h3m1 0h1m1 0h1m1 0h3m1 0h3m2 0h2M2 19.5h1m1 0h3m1 0h1m1 0h2m1 0h2M2 20.5h1m1 0h3m1 0h1m2 0h1m3 0h3m1 0h1m1 0h2M2 21.5h1m5 0h1m2 0h2m2 0h3m1 0h3M2 22.5h7m1 0h1m2 0h1m1 0h1m1 0h1m1 0h1m1 0h1"/></svg></div>
+  <div class="cod">PRUEBA<br>0001</div>
+  <div class="ciu">CIUDAD DE PRUEBA</div>
+  <div class="pz">Pieza 1 de 3</div>
+  <div class="regla"></div>
+  <div class="rt">Esta línea debe medir 5 cm</div>
+</div>
+
+<div class="imp" id="impGuia">
+  <div class="enc"><div><h1>GUÍA DE PRUEBA</h1><div>Documento de ejemplo, sin datos reales</div></div><div class="qr"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" shape-rendering="crispEdges"><path fill="#ffffff" d="M0 0h25v25H0z"/><path stroke="#000000" d="M2 2.5h7m1 0h2m1 0h2m1 0h7M2 3.5h1m5 0h1m1 0h3m3 0h1m5 0h1M2 4.5h1m1 0h3m1 0h1m1 0h2m4 0h1m1 0h3m1 0h1M2 5.5h1m1 0h3m1 0h1m2 0h2m1 0h1m1 0h1m1 0h3m1 0h1M2 6.5h1m1 0h3m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h3m1 0h1M2 7.5h1m5 0h1m2 0h4m1 0h1m5 0h1M2 8.5h7m1 0h1m1 0h1m1 0h1m1 0h7M11 9.5h1m1 0h2M2 10.5h1m2 0h7m2 0h2m2 0h1m1 0h3M3 11.5h3m1 0h1m2 0h1m1 0h1m1 0h1m3 0h1m3 0h1M2 12.5h1m1 0h1m2 0h3m1 0h1m5 0h1m1 0h1m2 0h1M2 13.5h1m1 0h4m1 0h3m1 0h1m1 0h2m1 0h2M3 14.5h1m2 0h3m2 0h2m2 0h5m1 0h1M10 15.5h1m2 0h4m4 0h2M2 16.5h7m1 0h1m1 0h1m1 0h2m1 0h2m1 0h1m1 0h1M2 17.5h1m5 0h1m1 0h1m2 0h2m3 0h3M2 18.5h1m1 0h3m1 0h1m1 0h1m1 0h3m1 0h3m2 0h2M2 19.5h1m1 0h3m1 0h1m1 0h2m1 0h2M2 20.5h1m1 0h3m1 0h1m2 0h1m3 0h3m1 0h1m1 0h2M2 21.5h1m5 0h1m2 0h2m2 0h3m1 0h3M2 22.5h7m1 0h1m2 0h1m1 0h1m1 0h1m1 0h1m1 0h1"/></svg></div></div>
+  <p>Remitente: Persona de Ejemplo Uno</p>
+  <p>Destinatario: Persona de Ejemplo Dos</p>
+  <table>
+    <tr><th>Pieza</th><th>Contenido</th><th>Pies cúbicos</th></tr>
+    <tr><td>1 de 3</td><td>Caja de ejemplo</td><td>16.0</td></tr>
+    <tr><td>2 de 3</td><td>Caja de ejemplo</td><td>12.5</td></tr>
+    <tr><td>3 de 3</td><td>Barril de ejemplo</td><td>8.0</td></tr>
+  </table>
+  <div class="regla"></div>
+  <p>Esta línea debe medir 10 cm</p>
+</div>
+
+<script src="jsQR.js"></script>
+<script>
+(function(){
+'use strict';
+var $=function(s){return document.querySelector(s)};
+var E={ua:navigator.userAgent,equipo:'',inst:false,bd:('BarcodeDetector' in window)};
+(function(){
+  var u=E.ua,d=/iPhone/.test(u)?'iPhone':/iPad/.test(u)?'iPad':/Android/.test(u)?'Android':'Computadora';
+  var b=/CriOS/.test(u)?'Chrome':/FxiOS/.test(u)?'Firefox':/EdgiOS|Edg\//.test(u)?'Edge':/Firefox\//.test(u)?'Firefox':/Chrome\//.test(u)?'Chrome':/Safari\//.test(u)?'Safari':'otro';
+  var m=u.match(/OS (\d+[_\d]*) like Mac/)||u.match(/Android (\d+[.\d]*)/);
+  E.equipo=d+(m?' '+m[1].replace(/_/g,'.'):'')+' · '+b;
+  E.inst=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+  $('#dEquipo').textContent=E.equipo; $('#dInst').textContent=E.inst?'Sí':'No'; $('#dBd').textContent=E.bd?'Sí':'No';
+})();
+function aviso(id,t){var a=$(id);a.textContent=t;a.classList.toggle('on',!!t)}
+function errCam(e){
+  var n=e&&e.name;
+  if(n==='NotAllowedError')return 'No hay permiso para la cámara. Actívalo en los ajustes del navegador y vuelve a intentar.';
+  if(n==='NotFoundError')return 'Este equipo no tiene cámara disponible.';
+  if(!navigator.mediaDevices)return 'La cámara solo funciona en una dirección con HTTPS.';
+  return 'No se pudo abrir la cámara: '+(n||e);
+}
+function abrir(video){
+  return navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}}})
+    .then(function(st){video.srcObject=st;return video.play().then(function(){return st})});
+}
+function cerrar(video){var st=video.srcObject;if(st){st.getTracks().forEach(function(t){t.stop()});video.srcObject=null}}
+function prom(a){return a.length?a.reduce(function(x,y){return x+y},0)/a.length:0}
+
+/* ---------- 1. escaneo ---------- */
+var S={on:false,set:{},n:0,total:0,times:[],dec:[],last:'',lastT:0,err:''};
+var sv=$('#sVid'),cv=document.createElement('canvas'),N=480;cv.width=cv.height=N;
+var cx=cv.getContext('2d',{willReadFrequently:true});
+function pintaScan(){
+  $('#sN').textContent=S.n+' de 20';
+  $('#sUlt').textContent=S.last||'ninguno';
+  $('#sProm').textContent=S.times.length?prom(S.times).toFixed(1):'sin datos';
+  $('#sDec').textContent=S.dec.length?Math.round(prom(S.dec)):'sin datos';
+}
+function leer(img){var r=jsQR(img.data,img.width,img.height,{inversionAttempts:'dontInvert'});return r&&r.data?r.data:''}
+window.__leer=leer;
+function ciclo(){
+  if(!S.on)return;
+  if(sv.readyState>=2&&sv.videoWidth){
+    var s=Math.min(sv.videoWidth,sv.videoHeight),x=(sv.videoWidth-s)/2,y=(sv.videoHeight-s)/2;
+    cx.drawImage(sv,x,y,s,s,0,0,N,N);
+    var t0=performance.now(),d=leer(cx.getImageData(0,0,N,N)),t1=performance.now();
+    S.dec.push(t1-t0);if(S.dec.length>300)S.dec.shift();
+    if(d&&d!==S.last){
+      if(S.lastT)S.times.push((t1-S.lastT)/1000);
+      S.last=d;S.lastT=t1;S.total++;
+      if(!S.set[d]){S.set[d]=1;S.n++}
+      var f=document.createElement('div');f.textContent=S.total+'. '+d;$('#sLista').prepend(f);
+      var c=$('#scanCam');c.classList.add('leido');setTimeout(function(){c.classList.remove('leido')},350);
+      if(navigator.vibrate)navigator.vibrate(60);
+      pintaScan();
+    }
+  }
+  requestAnimationFrame(ciclo);
+}
+$('#sBtn').onclick=function(){
+  if(S.on){S.on=false;cerrar(sv);$('#scanCam').classList.remove('on');this.textContent='Abrir cámara';pintaScan();salida();return}
+  var b=this;aviso('#sAviso','');
+  if(!navigator.mediaDevices){aviso('#sAviso',errCam());return}
+  abrir(sv).then(function(){S.on=true;S.lastT=0;S.last='';$('#scanCam').classList.add('on');b.textContent='Detener';b.scrollIntoView({behavior:'smooth',block:'start'});ciclo()})
+    .catch(function(e){S.err=String(e&&e.name||e);aviso('#sAviso',errCam(e));salida()});
+};
+
+/* ---------- 2. impresión ---------- */
+var P={et:0,gu:0};
+function imprimir(tipo){
+  document.body.setAttribute('data-print',tipo);
+  $('#pagina').textContent=tipo==='etiqueta'?'@page{size:100mm 60mm;margin:0}':'@page{size:A4;margin:12mm}';
+  if(tipo==='etiqueta')P.et++;else P.gu++;
+  salida();
+  setTimeout(function(){window.print()},50);
+}
+$('#pEt').onclick=function(){imprimir('etiqueta')};
+$('#pGu').onclick=function(){imprimir('guia')};
+
+/* ---------- 3 y 4. foto y sello ---------- */
+var F={on:false,geo:null,geoErr:'',w:0,h:0,kb:0,err:''};
+var fv=$('#fVid');
+function pedirGeo(){
+  if(!navigator.geolocation){F.geoErr='sin función de ubicación';return}
+  navigator.geolocation.getCurrentPosition(function(p){F.geo=p.coords;F.geoErr=''},function(e){F.geoErr=e.code===1?'permiso negado':'no se obtuvo'},{enableHighAccuracy:true,timeout:20000,maximumAge:0});
+}
+function dos(n){return (n<10?'0':'')+n}
+function sellar(c){
+  var g=c.getContext('2d'),w=c.width,h=c.height,fs=Math.max(14,Math.round(Math.min(w,h)*0.032)),pad=Math.round(fs*0.8),bh=fs*3*1.3+pad*2;
+  var d=new Date(),l1=dos(d.getDate())+'/'+dos(d.getMonth()+1)+'/'+d.getFullYear()+'  '+dos(d.getHours())+':'+dos(d.getMinutes())+':'+dos(d.getSeconds());
+  var l2=F.geo?F.geo.latitude.toFixed(5)+', '+F.geo.longitude.toFixed(5)+'  ±'+Math.round(F.geo.accuracy)+' m':'Ubicación no disponible ('+(F.geoErr||'sin respuesta')+')';
+  var l3='Guía PRUEBA-0001 · Pieza 1 de 3';
+  g.fillStyle='rgba(15,42,68,.82)';g.fillRect(0,h-bh,w,bh);
+  g.fillStyle='#fff';g.textBaseline='top';g.font='600 '+fs+'px Helvetica,Arial,sans-serif';
+  [l1,l2,l3].forEach(function(t,i){g.fillText(t,pad,h-bh+pad+i*fs*1.3)});
+  return [l1,l2,l3];
+}
+window.__sellar=sellar;window.__F=F;
+function tomar(){
+  var c=document.createElement('canvas');c.width=fv.videoWidth;c.height=fv.videoHeight;
+  c.getContext('2d').drawImage(fv,0,0);
+  sellar(c);
+  var u=c.toDataURL('image/jpeg',0.85);
+  F.w=c.width;F.h=c.height;F.kb=Math.round(u.length*0.75/1024);
+  var im=$('#fotoRes');im.src=u;im.style.display='block';
+  $('#fTam').textContent=F.w+' × '+F.h+' · '+F.kb+' KB';
+  $('#fGeo').textContent=F.geo?F.geo.latitude.toFixed(5)+', '+F.geo.longitude.toFixed(5):'no disponible ('+(F.geoErr||'sin respuesta')+')';
+  $('#fAcc').textContent=F.geo?'±'+Math.round(F.geo.accuracy)+' m':'sin datos';
+  salida();im.scrollIntoView({behavior:'smooth',block:'center'});
+}
+$('#fBtn').onclick=function(){
+  if(F.on){F.on=false;cerrar(fv);$('#fotoCam').classList.remove('on');$('#fTomar').style.display='none';this.textContent='Abrir cámara para la foto';return}
+  var b=this;aviso('#fAviso','');
+  if(!navigator.mediaDevices){aviso('#fAviso',errCam());return}
+  pedirGeo();
+  abrir(fv).then(function(){F.on=true;$('#fotoCam').classList.add('on');$('#fTomar').style.display='block';b.textContent='Cerrar cámara'})
+    .catch(function(e){F.err=String(e&&e.name||e);aviso('#fAviso',errCam(e));salida()});
+};
+$('#fTomar').onclick=tomar;
+
+/* ---------- resultados ---------- */
+var V={},NOM={ok:'Funcionó',reg:'Con problemas',no:'No funcionó'};
+[].forEach.call(document.querySelectorAll('.v'),function(div){
+  ['ok','reg','no'].forEach(function(k){
+    var b=document.createElement('button');b.type='button';b.textContent=NOM[k];b.setAttribute('data-v',k);
+    b.onclick=function(){V[div.getAttribute('data-k')]=k;[].forEach.call(div.children,function(x){x.classList.toggle('s',x===b)});salida()};
+    div.appendChild(b);
+  });
+});
+function salida(){
+  var L=[];
+  L.push('PRUEBA DE APP WEB');
+  L.push('Equipo: '+E.equipo);
+  L.push('App instalada: '+(E.inst?'sí':'no')+' | Lector de QR del navegador: '+(E.bd?'sí':'no'));
+  L.push('1. Escaneo de QR: '+(NOM[V.qr]||'sin marcar')+' | distintos '+S.n+' de 20, lecturas '+S.total+', segundos entre códigos '+(S.times.length?prom(S.times).toFixed(1):'-')+', ms por imagen '+(S.dec.length?Math.round(prom(S.dec)):'-')+(S.err?', error '+S.err:''));
+  L.push('2. Impresión: '+(NOM[V.imp]||'sin marcar')+' | etiqueta '+P.et+' veces, guía '+P.gu+' veces');
+  L.push('3. Foto solo con la cámara: '+(NOM[V.foto]||'sin marcar')+' | foto '+(F.w?F.w+'x'+F.h+', '+F.kb+' KB':'no tomada')+(F.err?', error '+F.err:''));
+  L.push('4. Sello sobre la foto: '+(NOM[V.sello]||'sin marcar')+' | ubicación '+(F.geo?'sí, ±'+Math.round(F.geo.accuracy)+' m':'no ('+(F.geoErr||'sin respuesta')+')'));
+  var n=$('#notas').value.trim();if(n)L.push('Notas: '+n);
+  L.push('Navegador: '+E.ua);
+  $('#salida').value=L.join('\n');
+}
+$('#notas').oninput=salida;
+$('#copiar').onclick=function(){
+  salida();var t=$('#salida'),b=this;
+  function listo(){b.textContent='Copiado';setTimeout(function(){b.textContent='Copiar resultados'},1800)}
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t.value).then(listo,function(){t.select();document.execCommand('copy');listo()})}
+  else{t.select();document.execCommand('copy');listo()}
+};
+window.addEventListener('afterprint',function(){document.body.removeAttribute('data-print')});
+salida();
+})();
+</script>
+</body>
+</html>
